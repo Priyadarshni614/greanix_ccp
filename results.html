@@ -3,9 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GREANIX - Carbon Footprint Results</title>
+  <title>GREANIX - Your Results</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     html, body {
       overscroll-behavior: none;
     }
@@ -13,72 +19,108 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f4fdf6;
-      color: #333;
+      background-color: #f8f9fa;
+      color: #343a40;
+      line-height: 1.6;
     }
 
     .navbar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       background-color: #ffffff;
       padding: 10px 30px;
-      border-bottom: 3px solid #28a745;
+      border-bottom: 3px solid #f9fbf9;
       box-shadow: 0 2px 8px rgba(0,0,0,0.07);
     }
+
     .navbar-left { display: flex; align-items: center; }
     .navbar-left img { height: 50px; margin-right: 10px; }
     .navbar-left span { font-size: 22px; font-weight: 600; color: #28a745; }
-    .navbar-center a { margin: 0 15px; text-decoration: none; color: #555; font-weight: 500; }
-    .navbar-center a.active, .navbar-center a:hover { color: #155724; }
+    .navbar-center a { margin: 0 15px; text-decoration: none; color: #555; font-weight: 500; padding: 8px 16px; border-radius: 8px; }
+    .navbar-center a:hover, .navbar-center a.active { background-color: #e9f7ef; color: #155724; }
     
-    .container {
-      max-width: 900px;
-      margin: 30px auto;
-      padding: 30px;
-      background-color: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    .steps {
+      display: flex;
+      justify-content: center;
+      margin: 30px 0;
     }
 
-    h2 {
+    .step {
+      padding: 15px 25px;
+      margin: 0 10px;
+      border-radius: 12px;
       text-align: center;
-      color: #2e7d32;
-      margin-bottom: 10px;
+      background-color: #ffffff;
+      border: 1px solid #dee2e6;
+      cursor: pointer;
     }
-    
-    .results-summary {
-        text-align: center;
-        margin-bottom: 40px;
-        padding: 20px;
-        background-color: #e8f5e9;
-        border-radius: 8px;
-        border-left: 5px solid #4caf50;
+
+    .step.active {
+      border-color: #28a745;
+      background-color: #e9f7ef;
+      font-weight: bold;
+      color: #155724;
     }
-    
+
+    .form-container {
+      max-width: 900px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border: 1px solid #dee2e6;
+      text-align: center;
+    }
+
     .total-footprint {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #1b5e20;
+      font-size: 3em;
+      font-weight: bold;
+      color: #155724;
+      margin-bottom: 20px;
     }
 
-    .chart-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 40px;
-        margin-top: 20px;
+    .breakdown-list {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 20px;
+      text-align: left;
     }
 
-    .no-data {
-        text-align: center;
-        padding: 50px;
+    .breakdown-list li {
+      background-color: #e9f7ef;
+      margin-bottom: 10px;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 1.2em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .breakdown-list li span {
+      font-weight: bold;
     }
 
-    @media (max-width: 768px) {
-        .chart-container {
-            grid-template-columns: 1fr;
-        }
+    .btn-save {
+      margin-top: 30px;
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      background-color: #28a745;
+      color: white;
+      transition: background-color 0.3s, transform 0.2s;
     }
+    
+    .btn-save:hover {
+      background-color: #218838;
+      transform: translateY(-2px);
+    }
+    
   </style>
 </head>
 <body>
@@ -90,221 +132,81 @@
     <div class="navbar-center">
       <a href="ex4.html">Home</a>
       <a href="calculate.html" class="active">Calculator</a>
+      <a href="profile.html">Profile</a>
       <a href="about.html">About</a>
     </div>
+    <div class="navbar-right" id="navbar-right"></div>
   </div>
 
-  <div class="container" id="results-container">
-    <h2>Your Monthly Carbon Footprint</h2>
-    
-    <div id="results-summary" class="results-summary">
-      <p>Your estimated total emissions are:</p>
-      <div id="total-footprint" class="total-footprint">-- kg CO₂e</div>
-      <p style="margin-top: 10px;">This is a breakdown of your emissions based on your inputs.</p>
-    </div>
-
-    <div class="chart-container">
-        <div><canvas id="barChart"></canvas></div>
-        <div><canvas id="pieChart"></canvas></div>
-    </div>
-
-    <div id="suggestions-container" style="margin-top: 40px; padding: 20px; background-color: #f1f8e9; border-radius: 8px;">
-      <h3 style="color: #2e7d32; text-align: center; margin-bottom: 15px;">💡 How You Can Improve</h3>
-      <div id="suggestions-content">
-      </div>
-    </div>
+  <div class="steps">
+    <div class="step">Home Energy</div>
+    <div class="step">Transportation</div>
+    <div class="step">Consumption</div>
+    <div class="step active">Results</div>
   </div>
 
-  <div class="container" id="no-data-container" style="display: none;">
-      <div class="no-data">
-        <h2>No Data Found</h2>
-        <p>We couldn't find any calculation data. Please go back and fill out the calculator to see your results.</p>
-        <a href="calculate.html" style="text-decoration: none; background-color: #28a745; color: white; padding: 10px 20px; border-radius: 5px; display: inline-block; margin-top: 20px;">Start Calculation</a>
-      </div>
+  <div class="form-container">
+    <h2>🎉 Your Monthly Carbon Footprint</h2>
+    <p>Based on your entries, here is your estimated carbon footprint.</p>
+
+    <div class="total-footprint" id="total-footprint">
+      Calculating...
+    </div>
+    <span style="font-size: 1.2em;">kg CO₂e per month</span>
+
+    <h3 style="margin-top: 40px; color: #1d4c4f;">Breakdown</h3>
+    <ul class="breakdown-list" id="breakdown-list">
+      <li>Home Energy: <span id="home-energy-value">0</span> kg CO₂e</li>
+      <li>Transportation: <span id="transportation-value">0</span> kg CO₂e</li>
+      <li>Consumption: <span id="consumption-value">0</span> kg CO₂e</li>
+    </ul>
+
+    <button class="btn-save" id="save-button" style="display:none;">Save to Profile</button>
   </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. RETRIEVE DATA FROM LOCAL STORAGE
-    const allData = JSON.parse(localStorage.getItem('carbonFootprintData'));
+  document.addEventListener('DOMContentLoaded', () => {
+    const data = JSON.parse(localStorage.getItem('carbonFootprintData'));
+    const userId = sessionStorage.getItem('greanixUserId');
 
-    if (!allData) {
-        document.getElementById('results-container').style.display = 'none';
-        document.getElementById('no-data-container').style.display = 'block';
-        return;
+    if (data && data.results) {
+      document.getElementById('total-footprint').textContent = data.results.total.toFixed(2);
+      document.getElementById('home-energy-value').textContent = data.results.breakdown.homeEnergy.toFixed(2);
+      document.getElementById('transportation-value').textContent = data.results.breakdown.transportation.toFixed(2);
+      document.getElementById('consumption-value').textContent = data.results.breakdown.consumption.toFixed(2);
+      
+      // If user is logged in, show the save button
+      if (userId) {
+          document.getElementById('save-button').style.display = 'inline-block';
+      }
+    } else {
+      document.getElementById('total-footprint').textContent = 'No data available. Please go back to the calculator.';
+      document.getElementById('breakdown-list').innerHTML = '';
     }
 
-    // 2. DEFINE EMISSION FACTORS (kg CO₂e per unit)
-    const factors = {
-        // Home Energy
-        electricity: 0.82,    // per kWh
-        naturalGas: 2.17,     // per SCM
-        lpg: 3.0,             // per kg
-        kerosene: 2.5,        // per liter
-        wood: 1.8,            // per kg
-        // Transportation
-        carKm: 0.153,         // per km (assuming avg petrol car 15km/l)
-        busKm: 0.027,         // per km
-        trainKm: 0.014,       // per km
-        flightHours: 50.0,    // per hour (changed from flightKm)
-        // Consumption
-        riceKg: 2.7,
-        pulsesKg: 0.9,
-        dairyKg: 13.0,
-        muttonKg: 39.2,
-        chickenKg: 6.9,
-        fishKg: 6.0,
-        shoppingItems: 12.0   // avg per item (clothing, electronics, etc.)
-    };
-
-    // 3. CALCULATE EMISSIONS FOR EACH CATEGORY
-    let homeEnergyEmissions = 0;
-    if (allData.homeEnergy) {
-        homeEnergyEmissions =
-            (allData.homeEnergy.electricity * factors.electricity) +
-            (allData.homeEnergy.naturalGas * factors.naturalGas) +
-            (allData.homeEnergy.lpg * factors.lpg) +
-            (allData.homeEnergy.kerosene * factors.kerosene) +
-            (allData.homeEnergy.wood * factors.wood) -
-            (allData.homeEnergy.solar * factors.electricity); // Solar offsets electricity
-    }
-    
-    let transportationEmissions = 0;
-    if (allData.transportation) {
-        transportationEmissions = 
-            (allData.transportation.carKm * factors.carKm) +
-            (allData.transportation.busKm * factors.busKm) +
-            (allData.transportation.trainKm * factors.trainKm) +
-            (allData.transportation.flightHours * factors.flightHours); // FIXED: changed from flightKm
-    }
-
-    let consumptionEmissions = 0;
-    if (allData.consumption) {
-        consumptionEmissions =
-            (allData.consumption.riceKg * factors.riceKg) +
-            (allData.consumption.pulsesKg * factors.pulsesKg) +
-            (allData.consumption.dairyKg * factors.dairyKg) +
-            (allData.consumption.muttonKg * factors.muttonKg) +
-            (allData.consumption.chickenKg * factors.chickenKg) +
-            (allData.consumption.fishKg * factors.fishKg) +
-            (allData.consumption.shoppingItems * factors.shoppingItems);
-    }
-    
-    const calculatedData = {
-        'Home Energy': Math.max(0, homeEnergyEmissions), // Ensure it's not negative
-        'Transportation': transportationEmissions,
-        'Consumption & Diet': consumptionEmissions
-    };
-
-    const totalEmissions = Object.values(calculatedData).reduce((sum, value) => sum + value, 0);
-
-    // 4. UPDATE THE UI
-    document.getElementById('total-footprint').textContent = `${totalEmissions.toFixed(2)} kg CO₂e`;
-    
-    const labels = Object.keys(calculatedData);
-    const values = Object.values(calculatedData).map(v => v.toFixed(2));
-    const backgroundColors = ['#66bb6a', '#42a5f5', '#ffca28', '#ef5350'];
-
-    // 5. RENDER THE CHARTS
-
-    // Bar Chart
-    new Chart(document.getElementById('barChart'), {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Emissions (kg CO₂/month)',
-          data: values,
-          backgroundColor: backgroundColors
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false },
-          title: {
-            display: true,
-            text: 'Carbon Emissions by Category',
-            font: { size: 16 }
-          }
-        },
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
+    // Event listener for the save button
+    document.getElementById('save-button').addEventListener('click', async () => {
+      const payload = {
+          userId: userId,
+          totalEmissions: data.results.total,
+          breakdown: data.results.breakdown
+      };
+      
+      const response = await fetch('/api/save-footprint', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+      });
+      
+      const result = await response.json();
+      if (response.ok) {
+          alert(result.message);
+      } else {
+          alert('Failed to save footprint: ' + result.message);
       }
     });
-
-    // Pie Chart
-    new Chart(document.getElementById('pieChart'), {
-      type: 'pie',
-      data: {
-        labels: labels,
-        datasets: [{
-          data: values,
-          backgroundColor: backgroundColors
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          title: {
-            display: true,
-            text: 'Emission Sources Distribution',
-            font: { size: 16 }
-          }
-        }
-      }
-    });
-
-    // 6. FIND HIGHEST EMISSION SOURCE AND DISPLAY SUGGESTIONS
-    function displaySuggestions(highestCategory) {
-        const suggestionsContent = document.getElementById('suggestions-content');
-        let suggestionsHTML = '';
-
-        switch (highestCategory) {
-            case 'Home Energy':
-                suggestionsHTML = `
-                    <p>Your <strong>Home Energy</strong> usage is your biggest contributor. Here are some tips:</p>
-                    <ul>
-                        <li><strong>Switch to LED lighting:</strong> They use up to 80% less energy than traditional bulbs.</li>
-                        <li><strong>Unplug electronics:</strong> Devices on standby still draw power. Unplug them when not in use.</li>
-                        <li><strong>Improve insulation:</strong> Ensure your windows and doors are properly sealed to prevent heat/cool air loss.</li>
-                        <li><strong>Consider solar panels:</strong> Even a small solar setup can significantly reduce your reliance on the grid.</li>
-                    </ul>`;
-                break;
-            case 'Transportation':
-                suggestionsHTML = `
-                    <p>Your <strong>Transportation</strong> habits have the largest impact. Consider these changes:</p>
-                    <ul>
-                        <li><strong>Use Public Transport:</strong> Opt for buses or trains for your daily commute.</li>
-                        <li><strong>Carpool:</strong> Share rides with colleagues or friends to reduce the number of cars on the road.</li>
-                        <li><strong>Maintain Your Vehicle:</strong> A well-maintained car with properly inflated tires is more fuel-efficient.</li>
-                        <li><strong>Walk or Cycle:</strong> For short distances, walking or cycling is the greenest option.</li>
-                    </ul>`;
-                break;
-            case 'Consumption & Diet':
-                suggestionsHTML = `
-                    <p>Your <strong>Consumption & Diet</strong> choices are your main source of emissions. Try these tips:</p>
-                    <ul>
-                        <li><strong>Reduce Red Meat:</strong> Mutton and other red meats have a very high carbon footprint. Try incorporating more plant-based meals.</li>
-                        <li><strong>Shop Local:</strong> Buying locally grown food reduces emissions from long-distance transportation.</li>
-                        <li><strong>Minimize Waste:</strong> Plan your meals to avoid food waste, which releases methane in landfills.</li>
-                        <li><strong>Buy Less, Choose Well:</strong> Opt for durable, long-lasting products over disposable ones to reduce your shopping footprint.</li>
-                    </ul>`;
-                break;
-        }
-        suggestionsContent.innerHTML = suggestionsHTML;
-    }
-
-    // Find the category with the highest value
-    const highestCategory = Object.keys(calculatedData).reduce((a, b) => calculatedData[a] > calculatedData[b] ? a : b);
-
-    // Call the function to display the suggestions
-    displaySuggestions(highestCategory);
-});
+  });
 </script>
-
+<script src="auth.js"></script>
 </body>
 </html>

@@ -151,6 +151,7 @@
       <a href="profile.html">Profile</a>
       <a href="about.html">About</a>
     </div>
+    <div class="navbar-right" id="navbar-right"></div>
   </div>
 
   <div class="steps">
@@ -182,9 +183,9 @@
         <input type="text" id="train-km" placeholder="e.g., 250" />
       </div>
       <div class="form-field">
-        <label for="flight-hours">Air Travel (hours)</label>
-        <input type="text" id="flight-hours" placeholder="e.g., 4" />
-        <span class="form-note">Total flight duration in a month.</span>
+        <label for="flight-km">Air Travel (km)</label>
+        <input type="text" id="flight-km" placeholder="e.g., 2500" />
+        <span class="form-note">Total flight distance in a month.</span>
       </div>
     </div>
 
@@ -203,7 +204,7 @@
       carKm: getValue('car-km'),
       busKm: getValue('bus-km'),
       trainKm: getValue('train-km'),
-      flightHours: getValue('flight-hours')
+      flightKm: getValue('flight-km')
     };
 
     allData.transportation = transportationData;
@@ -211,6 +212,6 @@
     window.location.href = 'consumption.html';
   }
 </script>
-
+<script src="auth.js"></script>
 </body>
 </html>

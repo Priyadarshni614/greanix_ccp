@@ -216,9 +216,70 @@
       fishKg: getValue('fish'),
       shoppingItems: getValue('shopping')
     };
-
     allData.consumption = consumptionData;
+    
+    // Step 1: Define Emissions Factors (example values in kgCO₂e per unit)
+    const emissionFactors = {
+      // Home Energy
+      electricity: 0.5,
+      naturalGas: 2.5,
+      kerosene: 3,
+      lpg: 3.5,
+      wood: 2,
+      solar: -0.1, // Solar reduces the footprint
+      // Transportation
+      car: 0.2,
+      bus: 0.05,
+      train: 0.02,
+      flight: 0.25, // Based on km input
+      // Consumption & Diet
+      rice: 1.5,
+      pulses: 0.8,
+      dairy: 2.4,
+      mutton: 30,
+      chicken: 6,
+      fish: 5,
+      shopping: 5
+    };
+    
+    // Step 2: Calculate Emissions for each category from stored data
+    const homeEnergyData = allData.homeEnergy || {};
+    const homeEnergyEmissions = (homeEnergyData.electricity * emissionFactors.electricity) +
+                                (homeEnergyData.naturalGas * emissionFactors.naturalGas) +
+                                (homeEnergyData.kerosene * emissionFactors.kerosene) +
+                                (homeEnergyData.lpg * emissionFactors.lpg) +
+                                (homeEnergyData.wood * emissionFactors.wood) +
+                                (homeEnergyData.solar * emissionFactors.solar);
+
+    const transportationData = allData.transportation || {};
+    const transportationEmissions = (transportationData.carKm * emissionFactors.car) +
+                                    (transportationData.busKm * emissionFactors.bus) +
+                                    (transportationData.trainKm * emissionFactors.train) +
+                                    (transportationData.flightKm * emissionFactors.flight);
+
+    const consumptionEmissions = (consumptionData.riceKg * emissionFactors.rice) +
+                                 (consumptionData.pulsesKg * emissionFactors.pulses) +
+                                 (consumptionData.dairyKg * emissionFactors.dairy) +
+                                 (consumptionData.muttonKg * emissionFactors.mutton) +
+                                 (consumptionData.chickenKg * emissionFactors.chicken) +
+                                 (consumptionData.fishKg * emissionFactors.fish) +
+                                 (consumptionData.shoppingItems * emissionFactors.shopping);
+
+    // Step 3: Calculate Total Emissions and breakdown
+    const totalEmissions = homeEnergyEmissions + transportationEmissions + consumptionEmissions;
+    const breakdown = {
+      homeEnergy: homeEnergyEmissions,
+      transportation: transportationEmissions,
+      consumption: consumptionEmissions
+    };
+
+    allData.results = {
+      total: totalEmissions,
+      breakdown: breakdown
+    };
+
     localStorage.setItem('carbonFootprintData', JSON.stringify(allData));
+    
     window.location.href = 'results.html';
   }
 </script>
