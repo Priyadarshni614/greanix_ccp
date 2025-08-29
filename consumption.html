@@ -139,7 +139,7 @@
     <div class="navbar-center">
       <a href="ex4.html">Home</a>
       <a href="calculate.html" class="active">Calculator</a>
-      <a href="instructions.html">Instructions</a>
+      <a href="profile.html">Profile</a>
       <a href="about.html">About</a>
     </div>
     <div class="navbar-right" id="navbar-right"></div>
@@ -226,7 +226,7 @@
       kerosene: 3,
       lpg: 3.5,
       wood: 2,
-      solar: -0.1, // Solar reduces the footprint
+      solar: 0.5, // The base factor, solar reduces the final number
       // Transportation
       car: 0.2,
       bus: 0.05,
@@ -248,8 +248,8 @@
                                 (homeEnergyData.naturalGas * emissionFactors.naturalGas) +
                                 (homeEnergyData.kerosene * emissionFactors.kerosene) +
                                 (homeEnergyData.lpg * emissionFactors.lpg) +
-                                (homeEnergyData.wood * emissionFactors.wood) +
-                                (homeEnergyData.solar * emissionFactors.solar);
+                                (homeEnergyData.wood * emissionFactors.wood) -
+                                (homeEnergyData.solar * emissionFactors.solar); // Solar is a deduction
 
     const transportationData = allData.transportation || {};
     const transportationEmissions = (transportationData.carKm * emissionFactors.car) +
