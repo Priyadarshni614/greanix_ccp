@@ -104,6 +104,39 @@
 
         .btn-next { background-color: #28a745; color: white; }
         .btn-next:hover { background-color: #218838; transform: translateY(-2px); }
+
+        @media (max-width: 900px) {
+            .navbar-center, .navbar-right {
+                display: none;
+            }
+            
+            .navbar-left {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .steps {
+                flex-wrap: wrap;
+            }
+            
+            .step {
+                width: 45%;
+                margin-bottom: 10px;
+            }
+
+            .form-container {
+                padding: 20px;
+                margin: 20px;
+            }
+            
+            .form-field {
+                min-width: 100%;
+            }
+
+            .chart-container {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
