@@ -101,6 +101,19 @@
             <h3>Yearly Total Emissions</h3>
             <canvas id="yearlyChangesChart"></canvas>
         </div>
+
+        <div class="chart-container" style="margin-top: 30px; background-color: #e8f5e9;">
+            <h3>View Status for a Specific Month</h3>
+            
+            <div style="margin-bottom: 20px;">
+              <label for="month-selector" style="font-weight: bold;">Select Month:</label>
+              <input type="month" id="month-selector" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
+            </div>
+            
+            <div id="monthly-summary-display">
+                <p>Please select a month to see the summary.</p> 
+            </div>
+        </div>
     </div>
 
 <script>
@@ -124,8 +137,65 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // 2. PROCESS DATA & RENDER CHARTS
-    
+    // --- NEW MONTH SELECTOR LOGIC ---
+    const monthSelector = document.getElementById('month-selector');
+    const summaryDisplay = document.getElementById('monthly-summary-display');
+
+    function displayMonthSummary(selectedDate) {
+        const year = selectedDate.getFullYear();
+        const month = selectedDate.getMonth(); // 0-11
+
+        const startOfMonth = new Date(year, month, 1);
+        const endOfMonth = new Date(year, month + 1, 0);
+
+        const monthEntries = history.filter(entry => {
+            const entryDate = new Date(entry.date);
+            return entryDate >= startOfMonth && entryDate <= endOfMonth;
+        });
+
+        if (monthEntries.length > 0) {
+            const totalSum = monthEntries.reduce((acc, entry) => acc + entry.totalEmissions, 0);
+            const avgTotal = totalSum / monthEntries.length;
+
+            const breakdownSum = monthEntries.reduce((acc, entry) => {
+                acc.homeEnergy += entry.breakdown.homeEnergy;
+                acc.transportation += entry.breakdown.transportation;
+                acc.consumption += entry.breakdown.consumption;
+                return acc;
+            }, { homeEnergy: 0, transportation: 0, consumption: 0 });
+
+            summaryDisplay.innerHTML = `
+                <p style="font-size: 1.5rem; font-weight: bold;">
+                    Average Footprint: ${avgTotal.toFixed(2)} kg CO₂e
+                </p>
+                <ul style="list-style-type: none; padding: 0; margin-top: 10px;">
+                    <li><strong>Home Energy:</strong> ${(breakdownSum.homeEnergy / monthEntries.length).toFixed(2)} kg</li>
+                    <li><strong>Transportation:</strong> ${(breakdownSum.transportation / monthEntries.length).toFixed(2)} kg</li>
+                    <li><strong>Consumption:</strong> ${(breakdownSum.consumption / monthEntries.length).toFixed(2)} kg</li>
+                </ul>
+            `;
+        } else {
+            summaryDisplay.innerHTML = '<p>No calculations were saved for the selected month.</p>';
+        }
+    }
+
+    monthSelector.addEventListener('change', () => {
+        if (monthSelector.value) {
+            const [year, month] = monthSelector.value.split('-').map(Number);
+            const selectedDate = new Date(year, month - 1, 15);
+            displayMonthSummary(selectedDate);
+        }
+    });
+
+    // Set default to current month
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    monthSelector.value = `${year}-${month}`;
+    monthSelector.dispatchEvent(new Event('change'));
+
+    // --- END OF NEW CODE BLOCK ---
+
     // --- Monthly Line Chart ---
     const monthlyData = {};
     history.forEach(entry => {
