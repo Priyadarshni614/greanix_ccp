@@ -211,8 +211,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     new Chart('monthlyTrendChart', {
-        type: 'line',
-        data: { labels: monthlyLabels, datasets: [{ label: 'Avg Monthly CO₂e (kg)', data: monthlyValues, borderColor: '#28a745', tension: 0.1 }] }
+        type: 'bar', // <-- Changed from 'line' to 'bar'
+        data: { labels: monthlyLabels, datasets: [{ label: 'Avg Monthly CO₂e (kg)', data: monthlyValues, backgroundColor: '#28a745' }] }
     });
 
     // --- Yearly Bar Chart ---
