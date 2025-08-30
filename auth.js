@@ -5,9 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (userId && navbarRight) {
         // User is logged in, show profile and logout buttons
         navbarRight.innerHTML = `
-            <span id="nav-username" style="margin-right: 15px; font-weight: bold;"></span>
-            <button class="login" onclick="window.location.href='/profile.html'">Profile</button>
-            <button class="signup" onclick="logout()">Logout</button>
+            <span id="nav-username" style="margin-right: 15px; font-weight: 500; color: #333;"></span>
+            <button class="login" style="padding: 8px 15px;" onclick="window.location.href='profile.html'">Profile</button>
+            <button class="signup" style="padding: 8px 15px;" onclick="logout()">Logout</button>
         `;
         // Fetch and display username
         fetchUsername(userId);
@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function logout() {
     sessionStorage.removeItem('greanixUserId');
-    window.location.href = '/login.html';
+    // Redirect to homepage after logout
+    window.location.href = '/'; 
 }
 
 async function fetchUsername(userId) {
@@ -30,7 +31,10 @@ async function fetchUsername(userId) {
         const response = await fetch(`/api/user-data/${userId}`);
         if (response.ok) {
             const userData = await response.json();
-            document.getElementById('nav-username').textContent = `Welcome, ${userData.username}`;
+            const usernameElement = document.getElementById('nav-username');
+            if (usernameElement) {
+                usernameElement.textContent = `Welcome, ${userData.username}`;
+            }
         }
     } catch (error) {
         console.error('Failed to fetch username:', error);

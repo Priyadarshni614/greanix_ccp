@@ -11,6 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // --- Middleware ---
+
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
@@ -93,7 +94,8 @@ app.post('/api/save-footprint', async (req, res) => {
 
         const newFootprintEntry = {
             totalEmissions: totalEmissions,
-            breakdown: breakdown 
+            breakdown: breakdown,
+            date: new Date() // Add this line to save the current date and time
         };
 
         await User.findByIdAndUpdate(
